@@ -1,10 +1,12 @@
 /**
  * POLARIS — Action Adapters
  * Deterministic EVM calldata decoders for supported Monad protocols.
- * Translates raw calldata into CanonicalAction objects.
+ * Uses real `viem` keccak256 and ABI encoding.
  */
 
+import { keccak256, toHex, stringToBytes } from 'viem';
 import { ActionType, CanonicalAction } from './types';
+import { computeActionHash } from './cryptoEip712';
 
 // Known Monad Protocol Router Addresses (Testnet Chain ID 10143)
 export const KNOWN_MONAD_CONTRACTS = {
@@ -13,17 +15,6 @@ export const KNOWN_MONAD_CONTRACTS = {
   PERPL_ROUTER: '0x6004101436004101436004101436004101436004',
   UNAUTHORIZED_ATTACK_CONTRACT: '0xBAD000000000000000000000000000000000BAD1',
 };
-
-// Simple pseudo-keccak256 hash helper for demo determinism
-function pseudoHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  const hex = Math.abs(hash).toString(16).padStart(8, '0');
-  return `0x${hex}${hex}${hex}${hex}${hex}${hex}${hex}${hex}`.substring(0, 66);
-}
 
 export class ActionAdapterRegistry {
   /**
@@ -85,13 +76,18 @@ export class ActionAdapterRegistry {
       targetName = 'ERC20 / Vault Transfer';
     }
 
-    const selectorHex = pseudoHash(functionName).substring(0, 10);
+    const selectorHex = keccak256(stringToBytes(`${functionName}(address,uint256)`)).substring(0, 10);
     const rawCalldata =
       params.rawCalldata ||
-      `${selectorHex}${params.amount.toString(16).padStart(64, '0')}`;
+      `${selectorHex}${Math.round(params.amount).toString(16).padStart(64, '0')}`;
 
-    const actionHash = pseudoHash(
-      `${actionType}:${targetLower}:${params.assetIn}:${params.amount}:${params.recipient}:${rawCalldata}`
+    const actionHash = computeActionHash(
+      actionType,
+      targetContract,
+      params.assetIn.toUpperCase(),
+      params.amount,
+      params.recipient,
+      rawCalldata
     );
 
     return {

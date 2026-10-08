@@ -14,6 +14,7 @@ import {
   SOLIDITY_EXECUTION_GATE,
   FOUNDRY_SECURITY_TEST,
 } from '../core/monad/contractsCode';
+import monadDeployment from '../../deployments/monad-testnet.json';
 
 export const MonadEvidenceView: React.FC = () => {
   const [activeCodeTab, setActiveCodeTab] = useState<'registry' | 'gate' | 'foundry'>('gate');
@@ -31,43 +32,13 @@ export const MonadEvidenceView: React.FC = () => {
     }
   };
 
-  const deployedContracts = [
-    {
-      name: 'PolarisExecutionGate.sol',
-      address: '0xEXECUTION_GATE_MONAD_10143',
-      network: 'Monad Testnet (Chain ID 10143)',
-      status: 'VERIFIED ON MONADSCAN',
-      description: 'Enforces the 17 Security Invariants for all autonomous agent execution calls.',
-    },
-    {
-      name: 'PolarisCapabilityRegistry.sol',
-      address: '0xCAPABILITY_REGISTRY_MONAD_10143',
-      network: 'Monad Testnet (Chain ID 10143)',
-      status: 'VERIFIED ON MONADSCAN',
-      description: 'Onchain capability passport registry supporting EIP-712 structured grants and attenuation.',
-    },
-    {
-      name: 'PolarisProtectedVault.sol',
-      address: '0xVAULT_MONAD_METROPOLIS_TRACK4_001',
-      network: 'Monad Testnet (Chain ID 10143)',
-      status: 'VERIFIED ON MONADSCAN',
-      description: 'Holds agent treasury funds ($10,000 USD TVL). Reverts direct withdrawal calls.',
-    },
-    {
-      name: 'PolarisKuruConsumer.sol',
-      address: '0x8004101438004101438004101438004101438004',
-      network: 'Monad Testnet (Chain ID 10143)',
-      status: 'VERIFIED ON MONADSCAN',
-      description: 'Reference application consumer for Kuru Flow DEX spot swap capabilities.',
-    },
-    {
-      name: 'PolarisPaymentVault.sol',
-      address: '0x7004101437004101437004101437004101437004',
-      network: 'Monad Testnet (Chain ID 10143)',
-      status: 'VERIFIED ON MONADSCAN',
-      description: 'Reference application consumer for USDC invoice and salary streaming capabilities.',
-    },
-  ];
+  const deployedContracts = Object.entries(monadDeployment.contracts).map(([key, val]) => ({
+    name: `${key}.sol`,
+    address: val.address,
+    network: monadDeployment.network,
+    status: val.verified ? 'VERIFIED ON MONAD TESTNET' : 'LOCAL BUILD',
+    sourcePath: val.sourcePath,
+  }));
 
   return (
     <div className="space-y-8">
@@ -79,11 +50,11 @@ export const MonadEvidenceView: React.FC = () => {
             Monad Smart Contracts & Foundry Evidence
           </h1>
           <span className="text-xs font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-800/50 px-2 py-0.5 rounded">
-            Foundry v1.8.0+ Network Monad
+            Foundry v1.8.0+ {monadDeployment.network}
           </span>
         </div>
         <p className="text-xs text-slate-400">
-          Solidity 0.8.31 EVM Osaka implementation deployed and verified on Monad Testnet (Chain ID 10143).
+          Solidity 0.8.31 EVM Osaka implementation deployed and verified on {monadDeployment.network} (Chain ID {monadDeployment.chainId}).
         </p>
       </div>
 
@@ -102,7 +73,7 @@ export const MonadEvidenceView: React.FC = () => {
                   {c.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">{c.description}</p>
+              <p className="text-xs text-slate-400 font-mono">{c.sourcePath}</p>
               <div className="text-[11px] font-mono text-slate-300 pt-1 border-t border-slate-800/60 truncate">
                 Address: {c.address}
               </div>

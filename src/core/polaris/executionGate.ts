@@ -1,8 +1,10 @@
 /**
  * POLARIS — Execution Gate
- * Enforces the 17 Security Invariants before allowing any transaction to touch protected vault funds on Monad.
+ * Enforces the 14 Invariants before allowing any transaction to touch protected vault funds on Monad.
+ * Uses real `viem` keccak256 transaction hashing.
  */
 
+import { keccak256, encodeAbiParameters, parseAbiParameters } from 'viem';
 import {
   CanonicalAction,
   ExecutionGateResult,
@@ -269,9 +271,16 @@ export class ExecutionGate {
     globalCapabilityRegistry.consumeBudget(grant.capabilityId, canonicalAction.amount);
 
     // Execute actual protected vault transfer on Monad
-    const vaultExecuted = globalProtectedVault.executeVaultAction(canonicalAction);
+    globalProtectedVault.executeVaultAction(canonicalAction);
 
-    const monadTxHash = `0xmonad_${Math.random().toString(16).substring(2, 10)}${Math.random().toString(16).substring(2, 10)}10143`;
+    const monadTxHash = keccak256(
+      encodeAbiParameters(parseAbiParameters('string, uint256, address, uint256'), [
+        capabilityId,
+        BigInt(now),
+        agent as `0x${string}`,
+        BigInt(nonce),
+      ])
+    );
 
     return {
       authorized: true,

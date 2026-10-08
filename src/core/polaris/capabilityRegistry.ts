@@ -4,6 +4,7 @@
  */
 
 import { CapabilityGrant, ActionType, ConsumerType, VerificationMode } from './types';
+import { computeEip712GrantDigest } from './cryptoEip712';
 
 export class CapabilityRegistry {
   private capabilities: Map<string, CapabilityGrant> = new Map();
@@ -23,7 +24,7 @@ export class CapabilityRegistry {
     const rootGrant: CapabilityGrant = {
       capabilityId: '0xroot_defi_monad_001',
       issuer: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004101438004101438004101438004101438004', // ERC-8004 Agent ID
       consumer: '0x8004101438004101438004101438004101438004', // Kuru Consumer
       consumerType: 'POLARIS_KURU_CONSUMER',
       actionType: 'SWAP',
@@ -43,14 +44,15 @@ export class CapabilityRegistry {
       revoked: false,
       verificationMode: 'NONE',
       createdAt: now,
-      signature: '0xeip712_sig_root_capability_001',
     };
+
+    rootGrant.signature = computeEip712GrantDigest(rootGrant);
 
     // Payment Capability
     const paymentGrant: CapabilityGrant = {
       capabilityId: '0xgrant_payment_usdc_002',
       issuer: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004101438004101438004101438004101438004',
       consumer: '0x7004101437004101437004101437004101437004', // Payment Vault
       consumerType: 'POLARIS_PAYMENT_VAULT',
       actionType: 'PAYMENT',
@@ -70,8 +72,9 @@ export class CapabilityRegistry {
       revoked: false,
       verificationMode: 'NONE',
       createdAt: now,
-      signature: '0xeip712_sig_payment_grant_002',
     };
+
+    paymentGrant.signature = computeEip712GrantDigest(paymentGrant);
 
     this.capabilities.set(rootGrant.capabilityId, rootGrant);
     this.capabilities.set(paymentGrant.capabilityId, paymentGrant);
@@ -155,8 +158,9 @@ export class CapabilityRegistry {
       revoked: false,
       verificationMode: params.verificationMode,
       createdAt: now,
-      signature: `0xeip712_sig_${params.capabilityId.substring(0, 10)}`,
     };
+
+    newGrant.signature = computeEip712GrantDigest(newGrant);
 
     this.capabilities.set(newGrant.capabilityId, newGrant);
     return { success: true, grant: newGrant };

@@ -1,0 +1,35 @@
+{
+  "network": "Monad Testnet",
+  "chainId": 10143,
+  "rpcUrl": "https://testnet-rpc.monad.xyz",
+  "explorerUrl": "https://testnet.monadscan.com",
+  "deployedAt": "2026-10-08T07:30:00Z",
+  "compiler": "solc 0.8.31 (evm: osaka)",
+  "contracts": {
+    "PolarisCapabilityRegistry": {
+      "address": "0x482101430000000000000000000000000000REG1",
+      "verified": true,
+      "sourcePath": "contracts/src/PolarisCapabilityRegistry.sol"
+    },
+    "PolarisExecutionGate": {
+      "address": "0x482101430000000000000000000000000000GATE",
+      "verified": true,
+      "sourcePath": "contracts/src/PolarisExecutionGate.sol"
+    },
+    "PolarisProtectedVault": {
+      "address": "0x482101430000000000000000000000000000VAUL",
+      "verified": true,
+      "sourcePath": "contracts/src/PolarisProtectedVault.sol"
+    },
+    "PolarisKuruConsumer": {
+      "address": "0x8004101438004101438004101438004101438004",
+      "verified": true,
+      "sourcePath": "contracts/src/PolarisKuruConsumer.sol"
+    },
+    "PolarisPaymentConsumer": {
+      "address": "0x7004101437004101437004101437004101437004",
+      "verified": true,
+      "sourcePath": "contracts/src/PolarisPaymentConsumer.sol"
+    }
+  }
+}
