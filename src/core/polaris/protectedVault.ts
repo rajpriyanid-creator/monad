@@ -9,9 +9,9 @@ import { CanonicalAction, ProtectedVaultState } from './types';
 
 export class ProtectedVault {
   private state: ProtectedVaultState = {
-    address: '0xVAULT_MONAD_METROPOLIS_TRACK4_001',
-    owner: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
-    gateAddress: '0xEXECUTION_GATE_MONAD_10143',
+    address: '0x4821014300000000000000000000000000000003',
+    owner: '0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d',
+    gateAddress: '0x4821014300000000000000000000000000000002',
     balances: {
       MON: 2500, // 2500 MON (~$5,000 USD value)
       USDC: 4000,

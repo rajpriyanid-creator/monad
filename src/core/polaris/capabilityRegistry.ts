@@ -23,7 +23,7 @@ export class CapabilityRegistry {
     // Root DeFi Capability
     const rootGrant: CapabilityGrant = {
       capabilityId: '0xroot_defi_monad_001',
-      issuer: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
+      issuer: '0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d',
       agent: '0x8004101438004101438004101438004101438004', // ERC-8004 Agent ID
       consumer: '0x8004101438004101438004101438004101438004', // Kuru Consumer
       consumerType: 'POLARIS_KURU_CONSUMER',
@@ -51,7 +51,7 @@ export class CapabilityRegistry {
     // Payment Capability
     const paymentGrant: CapabilityGrant = {
       capabilityId: '0xgrant_payment_usdc_002',
-      issuer: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
+      issuer: '0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d',
       agent: '0x8004101438004101438004101438004101438004',
       consumer: '0x7004101437004101437004101437004101437004', // Payment Vault
       consumerType: 'POLARIS_PAYMENT_VAULT',

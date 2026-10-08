@@ -1,14 +1,15 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
-import { globalCapabilityRegistry } from './src/core/polaris/capabilityRegistry.js';
-import { globalExecutionGate } from './src/core/polaris/executionGate.js';
-import { globalProtectedVault } from './src/core/polaris/protectedVault.js';
-import { ActionAdapterRegistry, KNOWN_MONAD_CONTRACTS } from './src/core/polaris/actionAdapters.js';
-import { ExecutionRequest, SecurityEventLog } from './src/core/polaris/types.js';
+import { globalCapabilityRegistry } from './src/core/polaris/capabilityRegistry';
+import { globalExecutionGate } from './src/core/polaris/executionGate';
+import { globalProtectedVault } from './src/core/polaris/protectedVault';
+import { ActionAdapterRegistry, KNOWN_MONAD_CONTRACTS } from './src/core/polaris/actionAdapters';
+import { ExecutionRequest, SecurityEventLog } from './src/core/polaris/types';
 
 dotenv.config();
 
@@ -33,7 +34,7 @@ const securityLogs: SecurityEventLog[] = [
   {
     id: 'sec_log_001',
     timestamp: Math.floor(Date.now() / 1000) - 3600,
-    agentId: '0x8004_AGENT_4821_TREASURY_BOT',
+    agentId: '0x8004000000000000000000000000000000004821',
     capabilityId: '0xroot_defi_monad_001',
     consumerName: 'Kuru Flow DEX',
     actionType: 'SWAP',
@@ -41,14 +42,14 @@ const securityLogs: SecurityEventLog[] = [
     asset: 'USDC',
     status: 'SUCCESS',
     reason: 'Authorized under Standing Capability #0xroot_defi_monad_001 ($300 <= $500 maxPerAction)',
-    txHash: '0xmonad_tx_8a92f0021c3b10143',
+    txHash: '0x8a92f0021c3b1014300000000000000000000000000000000000000000000001',
     blockNumber: 1482091,
     gasUsed: 84200,
   },
   {
     id: 'sec_log_002',
     timestamp: Math.floor(Date.now() / 1000) - 1800,
-    agentId: '0x8004_AGENT_4821_TREASURY_BOT',
+    agentId: '0x8004000000000000000000000000000000004821',
     capabilityId: '0xroot_defi_monad_001',
     consumerName: 'Kuru Flow DEX',
     actionType: 'APPROVE',
@@ -57,7 +58,7 @@ const securityLogs: SecurityEventLog[] = [
     status: 'BLOCKED',
     errorCode: 'ACTION_NOT_ALLOWED',
     reason: 'Prompt Injection Attack Prevented: Agent proposed TOKEN_APPROVAL (approve) which is not permitted by SWAP capability.',
-    txHash: '0xmonad_revert_f8812c9910143',
+    txHash: '0xf8812c9910143000000000000000000000000000000000000000000000000002',
     blockNumber: 1482142,
     gasUsed: 21000,
     adversarialAttackName: 'Prompt Injection: Function Substitution (approve vs swap)',
@@ -101,7 +102,7 @@ app.post('/api/agent/propose', async (req: Request, res: Response) => {
     const execRequest: ExecutionRequest = {
       requestId: `req_${Math.random().toString(16).substring(2, 8)}`,
       capabilityId: chosenCapabilityId,
-      agent: grant ? grant.agent : '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: grant ? grant.agent : '0x8004000000000000000000000000000000004821',
       consumer: target,
       canonicalAction,
       requestedAt: Math.floor(Date.now() / 1000),
@@ -185,7 +186,7 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
     request = {
       requestId: 'attack_01',
       capabilityId: '0xroot_defi_monad_001',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004000000000000000000000000000000004821',
       consumer: KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
       canonicalAction,
       requestedAt: now,
@@ -196,12 +197,12 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
     const canonicalAction = ActionAdapterRegistry.decodeAction(
       KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
       'swapExactTokensForTokens',
-      { assetIn: 'USDC', amount: 700, recipient: '0xVAULT' }
+      { assetIn: 'USDC', amount: 700, recipient: '0x4821014300000000000000000000000000000003' }
     );
     request = {
       requestId: 'attack_02',
       capabilityId: '0xroot_defi_monad_001',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004000000000000000000000000000000004821',
       consumer: KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
       canonicalAction,
       requestedAt: now,
@@ -212,12 +213,12 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
     const canonicalAction = ActionAdapterRegistry.decodeAction(
       KNOWN_MONAD_CONTRACTS.POLARIS_PAYMENT_VAULT,
       'payInvoice',
-      { assetIn: 'USDC', amount: 200, recipient: '0xMerchant' }
+      { assetIn: 'USDC', amount: 200, recipient: '0x7004101437004101437004101437004101437004' }
     );
     request = {
       requestId: 'attack_03',
       capabilityId: '0xroot_defi_monad_001', // Kuru Capability
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004000000000000000000000000000000004821',
       consumer: KNOWN_MONAD_CONTRACTS.POLARIS_PAYMENT_VAULT, // Payment Vault Consumer
       canonicalAction,
       requestedAt: now,
@@ -228,13 +229,13 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
     const canonicalAction = ActionAdapterRegistry.decodeAction(
       KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
       'swapExactTokensForTokens',
-      { assetIn: 'USDC', amount: 300, recipient: '0xVAULT' }
+      { assetIn: 'USDC', amount: 300, recipient: '0x4821014300000000000000000000000000000003' }
     );
     // Nonce 1 was consumed in seed default log
     request = {
       requestId: 'attack_04',
       capabilityId: '0xroot_defi_monad_001',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004000000000000000000000000000000004821',
       consumer: KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
       canonicalAction,
       requestedAt: now,
@@ -251,7 +252,7 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
     request = {
       requestId: 'attack_05',
       capabilityId: '0xroot_defi_monad_001',
-      agent: '0x8004_AGENT_4821_TREASURY_BOT',
+      agent: '0x8004000000000000000000000000000000004821',
       consumer: KNOWN_MONAD_CONTRACTS.UNAUTHORIZED_ATTACK_CONTRACT,
       canonicalAction,
       requestedAt: now,
@@ -292,13 +293,13 @@ app.post('/api/agent/adversarial-attack', (req: Request, res: Response) => {
 
 // POST /api/agent/direct-bypass (Direct Call to Vault.withdraw)
 app.post('/api/agent/direct-bypass', (req: Request, res: Response) => {
-  const result = globalProtectedVault.directWithdraw('0x8004_AGENT_4821_TREASURY_BOT', 1000, 'USDC');
+  const result = globalProtectedVault.directWithdraw('0x8004000000000000000000000000000000004821', 1000, 'USDC');
   
   const now = Math.floor(Date.now() / 1000);
   const logEntry: SecurityEventLog = {
     id: `sec_log_bypass_${Date.now()}`,
     timestamp: now,
-    agentId: '0x8004_AGENT_4821_TREASURY_BOT',
+    agentId: '0x8004000000000000000000000000000000004821',
     capabilityId: 'NONE (DIRECT VAULT CALL)',
     consumerName: 'Protected Vault (Direct Call)',
     actionType: 'TRANSFER',
@@ -343,8 +344,8 @@ app.post('/api/polaris/grant', (req: Request, res: Response) => {
   const result = globalCapabilityRegistry.grantCapability({
     capabilityId: capabilityId || `0xgrant_${Math.random().toString(16).substring(2, 8)}`,
     parentCapabilityId,
-    issuer: '0x1A2b3C4d5E6f7G8h9I0j1K2l3M4n5O6p7Q8r9S0t',
-    agent: '0x8004_AGENT_4821_TREASURY_BOT',
+    issuer: '0x1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d',
+    agent: '0x8004000000000000000000000000000000004821',
     consumer: consumer || KNOWN_MONAD_CONTRACTS.KURU_ROUTER,
     consumerType: consumerType || 'POLARIS_KURU_CONSUMER',
     actionType: actionType || 'SWAP',
@@ -390,24 +391,9 @@ async function startServer() {
     app.use('*', async (req, res, next) => {
       const url = req.originalUrl;
       try {
-        let template = await vite.transformIndexHtml(
-          url,
-          `<!doctype html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>POLARIS — Portable Agent Capability Infrastructure</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Syne:wght@500;700;800&display=swap" rel="stylesheet">
-  </head>
-  <body class="bg-slate-950 text-slate-100 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>`
-        );
+        const indexPath = path.resolve(__dirname, 'index.html');
+        let template = fs.readFileSync(indexPath, 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
       } catch (e: any) {
         vite.ssrFixStacktrace(e);
@@ -421,9 +407,9 @@ async function startServer() {
     });
   }
 
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`[POLARIS Server] Running on http://localhost:${PORT}`);
+  const PORT = 3000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[POLARIS Server] Running on http://0.0.0.0:${PORT}`);
   });
 }
 
