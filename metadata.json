@@ -1,0 +1,6 @@
+{
+  "name": "POLARIS — Portable Agent Capability Infrastructure",
+  "description": "Portable Agent Capability Passport & Execution Gate on Monad. Authorize AI agents with constrained standing capabilities, budget partitioning, and multi-application interoperability.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
